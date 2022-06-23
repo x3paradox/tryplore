@@ -1,9 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:fradio_nullsafety/fradio_nullsafety.dart';
+import 'package:tryplore/addtocart.dart';
 
 class ProductDetail extends StatefulWidget {
   const ProductDetail({super.key});
@@ -28,6 +30,20 @@ class _ProductDetailState extends State<ProductDetail> {
   List<String> list = [
     'https://tryplore.com/uploads/catalog/products/main_image/DSCF6706.JPG',
     'https://tryplore.com/uploads/catalog/products/main_image/DSCF6707.JPG',
+  ];
+  final List<ImageProvider> _imageProviders = [
+    Image.network(
+            'https://tryplore.com/uploads/catalog/products/main_image/DSCF6706.JPG')
+        .image,
+    Image.network(
+            'https://tryplore.com/uploads/catalog/products/main_image/DSCF6707.JPG')
+        .image,
+    Image.network(
+            'https://tryplore.com/uploads/catalog/products/main_image/DSCF6706.JPG')
+        .image,
+    Image.network(
+            'https://tryplore.com/uploads/catalog/products/main_image/DSCF6707.JPG')
+        .image,
   ];
   List<String> images = [
     'https://kwabey.com/images/moon-knight-black-tshirt/360/1700.jpg',
@@ -74,32 +90,46 @@ class _ProductDetailState extends State<ProductDetail> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CarouselSlider(
-                options: CarouselOptions(
-                  viewportFraction: 1,
-                  height: 500.0,
-                  autoPlay: true,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      _current = index;
-                    });
+              InteractiveViewer(
+                clipBehavior: Clip.none,
+                panEnabled: false,
+                scaleEnabled: false,
+                child: GestureDetector(
+                  onTap: () {
+                    final double scale = 3;
+                    final zoomed = Matrix4.identity()..scale(scale);
+                    MultiImageProvider multiImageProvider =
+                        MultiImageProvider(_imageProviders);
+                    showImageViewerPager(context, multiImageProvider);
                   },
-                ),
-                items: list.map((item) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return Container(
-                        width: MediaQuery.of(context).size.width,
-                        // margin: EdgeInsets.symmetric(horizontal: 5.0),
-                        decoration: BoxDecoration(),
-                        child: Image.network(
-                          '$item',
-                          fit: BoxFit.fill,
-                        ),
+                  child: CarouselSlider(
+                    options: CarouselOptions(
+                      viewportFraction: 1,
+                      height: 500.0,
+                      autoPlay: true,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _current = index;
+                        });
+                      },
+                    ),
+                    items: list.map((item) {
+                      return Builder(
+                        builder: (BuildContext context) {
+                          return Container(
+                            width: MediaQuery.of(context).size.width,
+                            // margin: EdgeInsets.symmetric(horizontal: 5.0),
+                            decoration: BoxDecoration(),
+                            child: Image.network(
+                              '$item',
+                              fit: BoxFit.fill,
+                            ),
+                          );
+                        },
                       );
-                    },
-                  );
-                }).toList(),
+                    }).toList(),
+                  ),
+                ),
               ),
               SizedBox(
                 height: 10,
@@ -287,7 +317,14 @@ class _ProductDetailState extends State<ProductDetail> {
                           ),
                         ],
                       ),
-                      onPressed: () {}),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const AddToCartProcessView()),
+                        );
+                      }),
                 ),
               ),
 
